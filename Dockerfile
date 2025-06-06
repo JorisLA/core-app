@@ -17,6 +17,7 @@ RUN addgroup --system sbr && adduser --system --no-create-home --group sbr
 
 ## copy service/configs
 COPY --chown=sbr:sbr ./service /opt/sbr/service/
+COPY --chown=sbr:sbr ./tests /opt/sbr/tests/
 
 ## copy venv
 COPY --chown=sbr:sbr --from=builder /opt/.venv /opt/.venv

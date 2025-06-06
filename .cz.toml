@@ -1,0 +1,7 @@
+[tool]
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version = "0.0.0"
+update_changelog_on_bump = true
+version_files = [".gitlab-ci.yml:VERSION"]
