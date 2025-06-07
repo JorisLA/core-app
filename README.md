@@ -74,3 +74,32 @@ docker run -p 8080:8080 saas-app
 ```
 
 The application will be available at http://localhost:8080
+
+## GitHub Actions
+
+This project includes GitHub Actions workflows for continuous integration and deployment:
+
+- `.github/workflows/ci.yml`: Runs tests on every push and pull request to the main branch
+- `.github/workflows/docker.yml`: Builds and pushes Docker images on pushes to the main branch and on tagged releases
+
+### CI Workflow
+
+The CI workflow does the following:
+1. Checks out the code
+2. Sets up Python
+3. Installs dependencies using Poetry
+4. Runs the tests
+
+### Docker Workflow
+
+The Docker workflow does the following:
+1. Checks out the code
+2. Sets up Docker Buildx
+3. Logs in to GitHub Container Registry
+4. Builds and pushes Docker images with tags for the latest commit and the GitHub ref name
+
+The Docker images will be pushed to GitHub Container Registry with the following tags:
+- `ghcr.io/{repository_owner}/core-app:latest` for the latest commit on the main branch
+- `ghcr.io/{repository_owner}/core-app:{ref_name}` for tagged releases
+
+No additional secrets are required, as the workflow uses the GitHub token for authentication.
