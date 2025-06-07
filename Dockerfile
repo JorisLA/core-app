@@ -1,39 +1,44 @@
 ########## build image ##########
-FROM python:3.12.5-bullseye AS builder
+FROM ghcr.io/astral-sh/uv:0.6.7-python3.13-bookworm AS builder
+
+## add Gitlab Repository Access for private git repositories
+ENV UV_COMPILE_BYTECODE=1
 
 ## add and install requirements
-RUN pip install poetry
 WORKDIR /opt
 COPY ./pyproject.toml .
-COPY ./poetry.lock .
-RUN poetry config virtualenvs.in-project true
-RUN poetry install
+COPY ./uv.lock .
+RUN uv sync --no-dev --locked
+
 
 ########## service image ##########
-FROM python:3.12.5-slim-bullseye AS runtime-image
+FROM python:3.13-slim-bullseye AS runtime-image
+ARG CI_COMMIT_TAG
+ARG CI_COMMIT_SHA
+ENV CI_COMMIT_TAG=$CI_COMMIT_TAG
+ENV CI_COMMIT_SHA=$CI_COMMIT_SHA
 
-## add user sbr
-RUN addgroup --system sbr && adduser --system --no-create-home --group sbr
+## add user jojo
+RUN addgroup --system jojo && adduser --system --no-create-home --group jojo
 
 ## copy service/configs
-COPY --chown=sbr:sbr ./service /opt/sbr/service/
-COPY --chown=sbr:sbr ./tests /opt/sbr/tests/
+COPY --chown=jojo:jojo ./service /opt/jojo/service/
+COPY --chown=jojo:jojo ./tests /opt/jojo/tests/
 
 ## copy venv
-COPY --chown=sbr:sbr --from=builder /opt/.venv /opt/.venv
+COPY --chown=jojo:jojo --from=builder /opt/.venv /opt/.venv
 
 ## virtualenv
 ENV VIRTUAL_ENV=/opt/.venv
-#RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 ## set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-## switch to non-root user sbr
-USER sbr
-WORKDIR /opt/sbr
+## switch to non-root user jojo
+USER jojo
+WORKDIR /opt/jojo
 
 ## run server
 CMD ["python3", "-m" , "service"]
