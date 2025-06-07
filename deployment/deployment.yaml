@@ -14,7 +14,7 @@ spec:
         app: core-app
     spec:
       containers:
-      - image: ghcr.io/jorisla/core-app:main
+      - image: ghcr.io/jorisla/core-app:v0.1.0
         name: core-app
         ports:
         - containerPort: 8080
